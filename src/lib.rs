@@ -17,6 +17,7 @@ async fn subscribe(_form: web::Form<FormData>) -> HttpResponse {
 // Notice the different signature!
 // We return `Server` on the happy path and we dropped the `async` keyword
 // We have no .await call, so it is not needed anymore.
+// Test actions
 pub fn run(listener: TcpListener) -> Result<Server, std::io::Error> {
     let server = HttpServer::new(|| {
         App::new()
