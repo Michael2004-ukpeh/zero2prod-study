@@ -18,8 +18,8 @@ jobs:
         image: postgres:12
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: newsletter
         ports:
           - 5432:5432
     env:
@@ -96,8 +96,8 @@ jobs:
         image: postgres:12
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: newsletter
         ports:
           - 5432:5432
     env:
@@ -152,8 +152,8 @@ jobs:
         image: postgres:12
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: newsletter
         ports:
           - 5432:5432
     env:
