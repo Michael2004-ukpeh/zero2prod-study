@@ -1,5 +1,5 @@
 use reqwest;
-use sqlx::{Connection, PgConnection};
+use sqlx::{Connection, PgConnection, PgPool};
 use std::net::TcpListener;
 use zero2prod::configuration::get_configuration;
 // tests/health_check.rs
@@ -9,17 +9,31 @@ use zero2prod::configuration::get_configuration;
 // You can inspect what code gets generated using
 // `cargo expand --test health_check` (<- name of the test file)
 
+pub struct TestApp {
+    pub address: String,
+    pub db_pool: PgPool,
+}
 // Spins up an instance of our app and returns its address
-fn spawn_app() -> String {
+fn spawn_app() -> TestApp {
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     //  We retrieve port assigned to us by the OS
     let port = listener.local_addr().unwrap().port();
-    let server = zero2prod::startup::run(listener).expect("Failed to bind address");
+    let address = format!("http://127.0.0.1:{}", port);
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_pool = PgPool::connect(&configuration.database.connection_string())
+        .await
+        .expect("Failed to connect to Postgres.");
+
+    let server =
+        zero2prod::startup::run(listener, connection_pool.clone()).expect("Failed to bind address");
     // Launch the server as a background task
     // tokio::spawn returns a handle to the spawned future,
     // but we have no use for it here, hence the non-binding let
     let _ = tokio::spawn(server);
-    format!("http://127.0.0.1:{}", port)
+    TestApp {
+        address,
+        db_pool: connection_pool,
+    }
 }
 
 #[tokio::test]
@@ -31,7 +45,7 @@ async fn health_check_works() {
     let client = reqwest::Client::new();
     // Act
     let response = client
-        .get(&format!("{}/health_check", &address))
+        .get(&format!("{}/health_check", &address.address))
         .send()
         .await
         .expect("Failed to execute request");
