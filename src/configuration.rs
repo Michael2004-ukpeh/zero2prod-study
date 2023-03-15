@@ -17,7 +17,7 @@ pub struct DatabaseSettings {
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Init our config reader
-    let mut settings = config::Config::builder();
+    let settings = config::Config::builder();
 
     // Add config value from a files with "configuration"
     let settings_builder = settings
